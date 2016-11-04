@@ -1,0 +1,31 @@
+{
+  "name": "tmulk",
+  "version": "1.0.0",
+  "description": "Twitter mass bulk download",
+  "main": "tmulk.js",
+  "bin": {
+    "tmulk": "tmulk.js"
+  },
+  "dependencies": {
+    "commander": "^2.9.0",
+    "twitter": "^1.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berkmancenter/tmulk.git"
+  },
+  "keywords": [
+    "twitter",
+    "bulk"
+  ],
+  "author": "Ryan Morrison~Westphal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/berkmancenter/tmulk/issues"
+  },
+  "homepage": "https://github.com/berkmancenter/tmulk#readme"
+}
