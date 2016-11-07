@@ -8,6 +8,7 @@ const pkg = require( path.join( __dirname, 'package.json' ) );
 const program = require( 'commander' );
 
 const Twitter = require( 'twitter' );
+let twitterCreds = require( './twitter.json' );
 
 program
   .version( pkg.version )
@@ -18,12 +19,7 @@ if ( !program.args.length ) {
   program.help();
 }
 
-let client = new Twitter( {
-  consumer_key: '',
-  consumer_secret: '',
-  access_token: '',
-  access_token_secret: ''
-} );
+let client = new Twitter( twitterCreds );
 
 for ( var handle of program.args ) {
   console.log( `now downloading ${ handle }` );
