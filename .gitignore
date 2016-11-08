@@ -8,6 +8,9 @@ twitter.json
 # node modules
 node_modules
 
+# temp folder
+tmp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
