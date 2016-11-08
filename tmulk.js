@@ -58,12 +58,20 @@ function getTweets( resolve, reject ) {
     count: 2
   };
 
+  if ( currentTweets.length > 0 ) {
+    timelineReq.max_id = currentTweets[ currentTweets.length - 1 ].id_str;
+    //timelineReq.page = Math.floor( currentTweets.length / tweetsPerRequest );
+  }
+
+  console.log( timelineReq );
+
   client.get( 'statuses/user_timeline', timelineReq, function( error, tweets, response ) {
     if ( !error ) {
       resolve( tweets.map( function( t ) {
         return {
           created_at: t.created_at,
           id: t.id,
+          id_str: t.id_str,
           text: t.text,
           source: t.source,
           retweet_count: t.retweet_count,
