@@ -11,6 +11,9 @@ const Twitter = require( 'twitter' );
 const twitterCreds = require( './twitter.json' );
 const tweetAttributes = [ 'created_at', 'id', 'text', 'source', 'retweet_count', 'favorite_count' ];
 
+const tweetsPerRequest = 2;
+const tweetMax = 4;
+
 program
   .version( pkg.version )
   .usage( '<username ...>' )
@@ -21,18 +24,32 @@ if ( !program.args.length ) {
 }
 
 let client = new Twitter( twitterCreds );
-var currentHandle = '';
-var currentTweets = [];
+let currentHandle = '';
+let currentTweets = [];
+
+let p = null;
 
 for ( var handle of program.args ) {
   currentHandle = handle;
   currentTweets = [];
 
-  let promise = new Promise( getTweets );
+  getTweetsPromise();
+}
 
-  promise.then( function( val ) {
-    console.log( val );
-  } );
+function getTweetsPromise( ) {
+  p = new Promise( getTweets );
+
+  p.then( getTweetsResolve );
+}
+
+function getTweetsResolve( val ) {
+  currentTweets.push( ...val );
+
+  if ( currentTweets.length >= tweetMax ) {
+    console.log( currentTweets );
+  } else {
+    setTimeout( getTweetsPromise, 1000 );
+  }
 }
 
 function getTweets( resolve, reject ) {
