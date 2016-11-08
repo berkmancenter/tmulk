@@ -11,8 +11,10 @@ const Twitter = require( 'twitter' );
 const twitterCreds = require( './twitter.json' );
 const tweetAttributes = [ 'created_at', 'id', 'text', 'source', 'retweet_count', 'favorite_count' ];
 
-const tweetsPerRequest = 2;
-const tweetMax = 4;
+const tweetsPerRequest = 200;
+const tweetMax = 800;
+const msBetweenQueries = (15 / 180) * 60000;
+//const msBetweenQueries = (15 / 15) * 60000;
 
 program
   .version( pkg.version )
@@ -43,39 +45,40 @@ function getTweetsPromise( ) {
 }
 
 function getTweetsResolve( val ) {
-  currentTweets.push( ...val );
+  if ( currentTweets.length === 0 ) {
+    currentTweets.push( ...val );
+  } else {
+    currentTweets.push( ...val.slice(1) );
+  }
 
   if ( currentTweets.length >= tweetMax ) {
-    console.log( currentTweets );
+    process.stdout.write( JSON.stringify( currentTweets, null, 2 ) );
   } else {
-    setTimeout( getTweetsPromise, 1000 );
+    setTimeout( getTweetsPromise, msBetweenQueries );
   }
 }
 
 function getTweets( resolve, reject ) {
   let timelineReq = {
     screen_name: currentHandle,
-    count: 2
+    count: tweetsPerRequest
   };
 
   if ( currentTweets.length > 0 ) {
     timelineReq.max_id = currentTweets[ currentTweets.length - 1 ].id_str;
-    //timelineReq.page = Math.floor( currentTweets.length / tweetsPerRequest );
   }
-
-  console.log( timelineReq );
 
   client.get( 'statuses/user_timeline', timelineReq, function( error, tweets, response ) {
     if ( !error ) {
       resolve( tweets.map( function( t ) {
         return {
           created_at: t.created_at,
-          id: t.id,
           id_str: t.id_str,
           text: t.text,
           source: t.source,
           retweet_count: t.retweet_count,
-          favorite_count: t.favorite_count
+          favorite_count: t.favorite_count,
+          truncated: t.truncated
         }
       } ) );
     } else {
