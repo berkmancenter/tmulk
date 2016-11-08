@@ -9,7 +9,7 @@ const program = require( 'commander' );
 
 const Twitter = require( 'twitter' );
 const twitterCreds = require( './twitter.json' );
-const tweetAttributes = [ 'id', 'text', 'source', 'retweet_count', 'favorite_count' ];
+const tweetAttributes = [ 'created_at', 'id', 'text', 'source', 'retweet_count', 'favorite_count' ];
 
 program
   .version( pkg.version )
@@ -21,18 +21,29 @@ if ( !program.args.length ) {
 }
 
 let client = new Twitter( twitterCreds );
+var currentHandle = '';
+var currentTweets = [];
 
 for ( var handle of program.args ) {
-  //console.log( `now downloading ${ handle }` );
+  currentHandle = handle;
+  currentTweets = [];
+
+  let promise = new Promise( getTweets );
+
+  promise.then( function( val ) {
+    console.log( val );
+  } );
+}
+
+function getTweets( resolve, reject ) {
   let timelineReq = {
-    screen_name: handle,
+    screen_name: currentHandle,
     count: 2
   };
 
   client.get( 'statuses/user_timeline', timelineReq, function( error, tweets, response ) {
     if ( !error ) {
-      //console.log( JSON.stringify( tweets.map( function( t ) {
-      console.log( tweets.map( function( t ) {
+      resolve( tweets.map( function( t ) {
         return {
           created_at: t.created_at,
           id: t.id,
@@ -42,14 +53,11 @@ for ( var handle of program.args ) {
           favorite_count: t.favorite_count
         }
       } ) );
-      //} ) ) );
-
-      if ( tweets.length === 2 ) {
-        console.log( 'There are more' );
-      }
-
     } else {
-      console.log( error );
+      reject( error );
     }
   } );
+
+
+  
 }
