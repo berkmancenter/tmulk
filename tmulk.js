@@ -14,7 +14,6 @@ const tweetAttributes = [ 'created_at', 'id', 'text', 'source', 'retweet_count',
 const tweetsPerRequest = 200;
 const tweetMax = 800;
 const msBetweenQueries = (15 / 180) * 60000;
-//const msBetweenQueries = (15 / 15) * 60000;
 
 program
   .version( pkg.version )
@@ -28,12 +27,16 @@ if ( !program.args.length ) {
 let client = new Twitter( twitterCreds );
 let currentHandle = '';
 let currentTweets = [];
+let first = true;
 
 let p = null;
 
 for ( var handle of program.args ) {
   currentHandle = handle;
   currentTweets = [];
+  first = true;
+
+  process.stdout.write( '[' );
 
   getTweetsPromise();
 }
@@ -41,18 +44,29 @@ for ( var handle of program.args ) {
 function getTweetsPromise( ) {
   p = new Promise( getTweets );
 
-  p.then( getTweetsResolve );
+  p.then( getTweetsResolve ).catch( function ( reason ) {
+    console.log( reason );
+  } );;
 }
 
 function getTweetsResolve( val ) {
-  if ( currentTweets.length === 0 ) {
-    currentTweets.push( ...val );
-  } else {
-    currentTweets.push( ...val.slice(1) );
+  if ( !first ) {
+    val = val.slice(1);
+  }
+
+  currentTweets.push( ...val );
+
+  for ( var tweet of val ) {
+    if ( first ) {
+      first = false;
+    } else {
+      process.stdout.write( ',' );
+    }
+    process.stdout.write( JSON.stringify( tweet, null, 2 ) );
   }
 
   if ( currentTweets.length >= tweetMax ) {
-    process.stdout.write( JSON.stringify( currentTweets, null, 2 ) );
+    process.stdout.write( ']' );
   } else {
     setTimeout( getTweetsPromise, msBetweenQueries );
   }
@@ -85,7 +99,5 @@ function getTweets( resolve, reject ) {
       reject( error );
     }
   } );
-
-
   
 }
