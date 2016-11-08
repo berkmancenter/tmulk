@@ -12,7 +12,7 @@ const twitterCreds = require( './twitter.json' );
 const tweetAttributes = [ 'created_at', 'id', 'text', 'source', 'retweet_count', 'favorite_count' ];
 
 const tweetsPerRequest = 200;
-const tweetMax = 800;
+const tweetMax = 3200;
 const msBetweenQueries = (15 / 180) * 60000;
 
 program
@@ -62,7 +62,7 @@ function getTweetsResolve( val ) {
     } else {
       process.stdout.write( ',' );
     }
-    process.stdout.write( JSON.stringify( tweet, null, 2 ) );
+    process.stdout.write( JSON.stringify( tweet ) );
   }
 
   if ( currentTweets.length >= tweetMax ) {
