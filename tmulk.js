@@ -47,6 +47,7 @@ function getTweetsPromise( ) {
 
   p.then( getTweetsResolve ).catch( function ( reason ) {
     console.warn( `[error] handle: ${currentHandle}, reason: ${reason}` );
+    process.stdout.write( ']' );
   } );;
 }
 
