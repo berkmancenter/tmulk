@@ -13,7 +13,7 @@ const tweetAttributes = [ 'created_at', 'id', 'text', 'source', 'retweet_count',
 
 const tweetsPerRequest = 200;
 const tweetMax = 3200;
-const msBetweenQueries = (15 / 180) * 60000;
+const msBetweenQueries = (16 / 180) * 60000;
 
 program
   .version( pkg.version )
@@ -36,6 +36,7 @@ for ( var handle of program.args ) {
   currentTweets = [];
   first = true;
 
+  console.warn( `[start] handle: ${currentHandle}` );
   process.stdout.write( '[' );
 
   getTweetsPromise();
@@ -45,7 +46,7 @@ function getTweetsPromise( ) {
   p = new Promise( getTweets );
 
   p.then( getTweetsResolve ).catch( function ( reason ) {
-    console.log( reason );
+    console.warn( `[error] handle: ${currentHandle}, reason: ${reason}` );
   } );;
 }
 
@@ -54,6 +55,7 @@ function getTweetsResolve( val ) {
     val = val.slice(1);
   }
 
+  console.warn( `[progress] handle: ${currentHandle}, length: ${val.length}` );
   currentTweets.push( ...val );
 
   for ( var tweet of val ) {
@@ -65,8 +67,9 @@ function getTweetsResolve( val ) {
     process.stdout.write( JSON.stringify( tweet ) );
   }
 
-  if ( currentTweets.length >= tweetMax ) {
+  if ( currentTweets.length >= tweetMax || val.length === 0 ) {
     process.stdout.write( ']' );
+    console.warn( `[end] handle: ${currentHandle}` );
   } else {
     setTimeout( getTweetsPromise, msBetweenQueries );
   }
@@ -82,6 +85,7 @@ function getTweets( resolve, reject ) {
     timelineReq.max_id = currentTweets[ currentTweets.length - 1 ].id_str;
   }
 
+  console.warn( `[get]`, timelineReq );
   client.get( 'statuses/user_timeline', timelineReq, function( error, tweets, response ) {
     if ( !error ) {
       resolve( tweets.map( function( t ) {
