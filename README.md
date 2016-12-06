@@ -30,6 +30,7 @@ You will get status messages on the console and the JSON output will be valid an
 
 Setup
 =====
+
 First, install any dependencies by using npm:
 
     $ npm install
@@ -46,3 +47,19 @@ Rate limiting
 tmulk abides by Twitter's API rate limits. It will not attempt to download more than 3,200 tweets and will not go faster than 180 calls every 15 minutes.
 
 That is assuming you are using a single Twitter App's access tokens. If you run more than tmulk simultaneously using the same access tokens, you will be rate limited and one or more instances will not download all the tweets available.
+
+Private accounts
+================
+
+If the account from which you're downloading tweets is private or has been deleted, tmulk will get an authorization error.
+
+    node tmulk.js gailcat22 > gailcat22.json
+    [start] handle: gailcat22
+    [get] { screen_name: 'gailcat22', count: 200 }
+    [error] handle: gailcat22, reason: Error: HTTP Error: 401 Authorization Required
+
+The output, gailcat22.json, will contain an empty array.
+
+    []
+    
+
