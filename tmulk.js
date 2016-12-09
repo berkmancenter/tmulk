@@ -17,7 +17,7 @@ const msBetweenQueries = (16 / 180) * 60000;
 
 program
   .version( pkg.version )
-  .usage( '<username ...>' )
+  .usage( '<username>' )
   .parse( process.argv );
 
 if ( !program.args.length ) {
